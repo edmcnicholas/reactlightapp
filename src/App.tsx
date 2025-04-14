@@ -4,11 +4,10 @@ import InputToggle from "./Componenets/InputToggle";
 import { useState } from "react";
 import Collapse from "react-bootstrap/Collapse";
 import InputWebUSB from "./Componenets/InputWebUSB";
-import { InputWebUSBSend } from "./Componenets/InputWebUSB";
 
 import { Col, Container } from "react-bootstrap";
 import { InputGroup } from "react-bootstrap";
-import { Struct } from "typed-struct";
+import { Buffer } from "buffer";
 import * as appMessages from "./Componenets/message";
 
 import { useConfigStore } from "./Componenets/useConfigStore";
@@ -66,8 +65,9 @@ function App() {
     setConnectedOpen(item);
   };
 
-  const handleOnUSBConfig = (msg: Struct) => {
-    let config = new appMessages.msgConfig(appMessages.msgConfig.raw(msg));
+  const handleOnUSBConfig = (msg: ArrayBuffer) => {
+    const buffer: Buffer = new Buffer(msg);
+    let config = new appMessages.msgConfig(buffer);
     //COnfigure Device
     setFirmware(config.major + "." + config.minor);
     setSerial(

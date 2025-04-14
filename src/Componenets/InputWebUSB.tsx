@@ -2,13 +2,13 @@
  *   Copyright (c) 2025 Rogue Solutions LLC
  *   All rights reserved.
  */
-import { useRef } from "react";
+// import { useRef } from "react";
 import { Row, Col, Container } from "react-bootstrap";
 /// <reference types="w3c-web-usb" />
 import Button from "react-bootstrap/Button";
 
 import * as appMessages from "./message";
-import { Struct } from "typed-struct";
+// import { Buffer } from "buffer";
 
 let device: USBDevice;
 
@@ -26,32 +26,32 @@ const listen = async () => {
 
 export const InputWebUSBSend = async (data: string) => {
   // device = useRef<USBDevice>(null);
-  if (device.current.opened) {
+  if (device.opened) {
     // var data = "hello world";
     const encoder = new TextEncoder();
     console.log(data);
 
-    device.current.transferOut(1, encoder.encode(data));
+    device.transferOut(1, encoder.encode(data));
   }
 };
 
 export const InputWebUSBIsConnected = () => {
-  return device.current.opened;
+  return device.opened;
 };
 
 interface Props {
   onConnected: (item: boolean) => void;
-  onConfig: (config: Struct) => void;
+  onConfig: (config: ArrayBuffer) => void;
 }
 
 function InputWebUSB({ onConnected, onConfig }: Props) {
-  device = useRef<USBDevice>(null);
+  // device = useRef<USBDevice>(null);
   const filters = [{ vendorId: 0x0483, productId: 0x000a }];
   const encoder = new TextEncoder();
   const onClick = async () => {
-    device.current = await navigator.usb.requestDevice({ filters });
+    device = await navigator.usb.requestDevice({ filters });
 
-    if (device.current === null) {
+    if (device === null) {
       return;
     }
 
@@ -60,9 +60,9 @@ function InputWebUSB({ onConnected, onConfig }: Props) {
       onConnected(false);
     };
 
-    await device.current.open();
-    await device.current.selectConfiguration(1);
-    await device.current.claimInterface(0);
+    await device.open();
+    await device.selectConfiguration(1);
+    await device.claimInterface(0);
     // await device.current.controlTransferOut({
     //   requestType: "vendor",
     //   recipient: "interface",
@@ -71,9 +71,9 @@ function InputWebUSB({ onConnected, onConfig }: Props) {
     //   index: 0x02,
     // });
 
-    console.log(device.current);
+    console.log(device);
 
-    if (device.current.opened) {
+    if (device.opened) {
       console.log("Open");
     }
 
@@ -84,19 +84,17 @@ function InputWebUSB({ onConnected, onConfig }: Props) {
     console.log(cfgReq);
 
     //TODO: Request device data
-    device.current.transferOut(
-      1,
-      encoder.encode(appMessages.appHdr.raw(cfgReq))
-    );
+    device.transferOut(1, encoder.encode(appMessages.appHdr.raw(cfgReq)));
 
     console.log("Sent");
 
-    device.current.transferIn(1, 64).then((result) => {
-      const appmsg = appMessages.decodeMsg(result.data.buffer);
+    device.transferIn(1, 64).then((result: USBInTransferResult) => {
+      const data = result.data?.buffer ?? new ArrayBuffer();
+      const appmsg = appMessages.decodeConfigMsg(data);
       console.log(appmsg);
-      onConfig(appmsg);
+      onConfig(appMessages.msgConfig.raw(appmsg));
     });
-    onConnected(device.current.opened);
+    onConnected(device.opened);
   };
 
   return (

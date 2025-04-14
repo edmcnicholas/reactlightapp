@@ -117,7 +117,7 @@ export const appMsg = new Struct("appMsg")
 
 
 
-export function decodeMsg(inputbuffer: ArrayBuffer) {
+export function decodeConfigMsg(inputbuffer: ArrayBuffer) {
   const buffer: Buffer = new Buffer(inputbuffer);
   console.log("Len " + buffer.byteLength);
   console.log(buffer);
