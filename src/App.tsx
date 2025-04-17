@@ -88,7 +88,7 @@ function App() {
   };
 
   return (
-    <Stack gap={3}>
+    <Stack gap={3} className="mt-3 mb-3">
       <InputWebUSB
         onConnected={handleOnUSBConnected}
         onConfig={handleOnUSBConfig}
