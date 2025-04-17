@@ -15,6 +15,8 @@ export enum eParam {
   eParamPitchDetectionEnable,
   eParamPitchThreshold,
   eParamOrientation,
+  eParamPower,
+  eParamBootloader =0xff,
 } 
 
 export const appHdr = new Struct("appHdr") // give a name to the constructor
@@ -71,11 +73,20 @@ export const msgOrientation = new Struct("msgOrientation")
   .UInt8("orientation")
   .compile();
 
+export const msgPower = new Struct("msgPower")
+  .UInt8("power")
+  .compile();
+
+export const msgBootloader = new Struct("msgBootloader")
+  .UInt8("bootloader")
+  .compile();
+
 export const msgConfig = new Struct("msgConfig")
   .UInt8("major")
   .UInt8("minor")
   .UInt8("week")
   .UInt8("year")
+  .UInt8("dev")
   .UInt16LE("serial")
   .UInt8("dexterity")
   .UInt16LE("powerTimeout")
@@ -84,6 +95,7 @@ export const msgConfig = new Struct("msgConfig")
   .Boolean8("pitchEnable")
   .UInt8("pitch")
   .UInt8("orientation")
+  .UInt8("power")
   .compile();
 
 export const appMsgUnion = new Struct("appMsgUnion")
@@ -164,7 +176,7 @@ export function msgSetInactivityEnable(inactivityEnable:boolean){
 
 export function msgSetInactivityTimeout(inactivityTimeout:number){
   const hdr = new appHdr();
-  hdr.msgID = eParam.eParamInactivityDetection;
+  hdr.msgID = eParam.eParamInactivityTimeout;
   hdr.msgLen =  msgInactivityTimeout.baseSize + appHdr.baseSize;
   const msg = new msgInactivityTimeout();
   msg.inactivityTimeout = inactivityTimeout;
@@ -196,4 +208,22 @@ export function msgSetOrientation(orientation:number){
   const msg = new msgOrientation();
   msg.orientation = orientation;
   InputWebUSBSend(appHdr.raw(hdr) + msgOrientation.raw(msg));
+}
+
+export function msgSetPower(power:boolean){
+  const hdr = new appHdr();
+  hdr.msgID = eParam.eParamPower;
+  hdr.msgLen =  msgPower.baseSize + appHdr.baseSize;
+  const msg = new msgPower();
+  msg.power = Number(power);
+  InputWebUSBSend(appHdr.raw(hdr) + msgPower.raw(msg));
+}
+
+export function msgSetBootloader(bootloader:boolean){
+  const hdr = new appHdr();
+  hdr.msgID = eParam.eParamBootloader;
+  hdr.msgLen =  msgBootloader.baseSize + appHdr.baseSize;
+  const msg = new msgBootloader();
+  msg.bootloader = Number(bootloader);
+  InputWebUSBSend(appHdr.raw(hdr) + msgBootloader.raw(msg));
 }

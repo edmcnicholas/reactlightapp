@@ -35,6 +35,7 @@ function App() {
   };
 
   const handleInactivityChange = (item: number) => {
+    console.log(item);
     setInactivityTimeout(item);
     appMessages.msgSetInactivityTimeout(item);
   };
@@ -45,14 +46,17 @@ function App() {
   };
 
   const handleOnSelectionDexterity = (item: boolean) => {
+    setDexterity(item);
     appMessages.msgSetDexterity(Number(item));
   };
 
   const handleOnSelectionOrientation = (item: boolean) => {
+    setOrientation(Number(item));
     appMessages.msgSetOrientation(Number(item));
   };
 
   const handlePowerChange = (item: number) => {
+    setPowerTimeout(item);
     appMessages.msgSetPowerTimeout(item);
   };
 

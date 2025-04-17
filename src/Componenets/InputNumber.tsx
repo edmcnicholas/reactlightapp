@@ -29,13 +29,15 @@ function InputNumber({
   function onInc() {
     if (value < max) {
       // setValNumber(value + step);
-      onChange(value + step);
+      value = value + step;
+      onChange(value);
     }
   }
   function onDec() {
     if (value > min) {
       // setValNumber(value - step);
-      onChange(value - step);
+      value = value - step;
+      onChange(value);
     }
   }
 
